@@ -1,15 +1,22 @@
 fn main() {
     let (n, e, d) = key_gen();
 
-    for x in 100000..100010 {
+    let text = "abcde🙏";
+    let mut ans = Vec::new();
+
+    for x in text.as_bytes() {
         println!("x: {}", x);
-        let y = encrypt(x, n, e);
+        let y = encrypt(*x as u64, n, e);
         println!("y: {}", y);
-        println!("x: {}", decrypt(y, n, d));
+        let x = decrypt(y, n, d);
+        println!("x: {}", x);
+        ans.push(x as u8);
     }
+
+    println!("{}", String::from_utf8_lossy(&ans));
 }
 
-fn key_gen() -> (usize, usize, usize) {
+fn key_gen() -> (u64, u64, u64) {
     let (p, q) = (991, 997);
     let phi = (p - 1) * (q - 1);
     let n = p * q;
@@ -18,15 +25,15 @@ fn key_gen() -> (usize, usize, usize) {
     (n, e, d)
 }
 
-fn encrypt(x: usize, n: usize, e: usize) -> usize {
+fn encrypt(x: u64, n: u64, e: u64) -> u64 {
     pow(x, n, e)
 }
 
-fn decrypt(y: usize, n: usize, d: usize) -> usize {
+fn decrypt(y: u64, n: u64, d: u64) -> u64 {
     pow(y, n, d)
 }
 
-fn pow(base: usize, n: usize, exp: usize) -> usize {
+fn pow(base: u64, n: u64, exp: u64) -> u64 {
     let mut exp = exp;
     let mut l = 1;
     let mut r = base;
@@ -40,7 +47,7 @@ fn pow(base: usize, n: usize, exp: usize) -> usize {
     l
 }
 
-fn euclid(e: usize, phi: usize) -> usize {
+fn euclid(e: u64, phi: u64) -> u64 {
     let e = e as isize;
     let phi = phi as isize;
     let (mut x0, mut y0, mut z0) = (1, 0, e);
@@ -55,5 +62,5 @@ fn euclid(e: usize, phi: usize) -> usize {
     while ans < 0 {
         ans += phi;
     }
-    (ans % phi) as usize
+    (ans % phi) as u64
 }
