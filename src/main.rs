@@ -1,23 +1,30 @@
 fn main() {
     let (n, e, d) = key_gen();
+    println!("n: {}, e: {}, d: {}", n, e, d);
 
-    let text = "abcde🙏";
-    let mut ans = Vec::new();
+    let text = "RSA暗号（RSAあんごう）とは、桁数が大きい合成数の素因数分解が現実的な時間内で困難であると信じられていることを安全性の根拠とした公開鍵暗号の一つである。暗号とデジタル署名を実現できる方式として最初に公開されたものである。";
+    println!("{}", text);
 
+    let mut cipher_text = Vec::new();
     for x in text.as_bytes() {
-        println!("x: {}", x);
-        let y = encrypt(*x as u64, n, e);
-        println!("y: {}", y);
-        let x = decrypt(y, n, d);
-        println!("x: {}", x);
-        ans.push(x as u8);
+        let y = format!("{:08x}", encrypt(*x as u64, n, e));
+        cipher_text.push(y);
+    }
+    let cipher_text = cipher_text.join("");
+    println!("{}", cipher_text);
+
+    let mut ans = Vec::new();
+    for chunk in cipher_text.chars().collect::<Vec<char>>().chunks(8) {
+        let chunk = chunk.iter().collect::<String>();
+        let y = u64::from_str_radix(&chunk, 16).unwrap();
+        ans.push(decrypt(y, n, d) as u8);
     }
 
     println!("{}", String::from_utf8_lossy(&ans));
 }
 
 fn key_gen() -> (u64, u64, u64) {
-    let (p, q) = (991, 997);
+    let (p, q) = (63211, 65171);
     let phi = (p - 1) * (q - 1);
     let n = p * q;
     let e = 65537;
