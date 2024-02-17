@@ -1,3 +1,5 @@
+use std::time;
+
 fn main() {
     let (n, e, d) = key_gen();
     println!("n: {}, e: {}, d: {}", n, e, d);
@@ -13,12 +15,24 @@ fn main() {
     let cipher_text = cipher_text.join("");
     println!("{}", cipher_text);
 
-    let mut ans = Vec::new();
-    for chunk in cipher_text.chars().collect::<Vec<char>>().chunks(8) {
-        let chunk = chunk.iter().collect::<String>();
-        let y = u64::from_str_radix(&chunk, 16).unwrap();
-        ans.push(decrypt(y, n, d) as u8);
-    }
+    let now = time::Instant::now();
+    // let mut ans = Vec::new();
+    // for chunk in cipher_text.chars().collect::<Vec<char>>().chunks(8) {
+    //     let chunk = chunk.iter().collect::<String>();
+    //     let y = u64::from_str_radix(&chunk, 16).unwrap();
+    //     ans.push(decrypt(y, n, d) as u8);
+    // }
+    let ans = cipher_text
+        .chars()
+        .collect::<Vec<char>>()
+        .chunks(8)
+        .map(|c| {
+            let chunk = c.iter().collect::<String>();
+            let y = u64::from_str_radix(&chunk, 16).unwrap();
+            decrypt(y, n, d) as u8
+        })
+        .collect::<Vec<u8>>();
+    println!("{:?}", now.elapsed());
 
     println!("{}", String::from_utf8_lossy(&ans));
 }
